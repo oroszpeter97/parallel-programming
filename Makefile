@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -Wall -Wextra -std=c++11 -Iinclude
+CFLAGS = -Wall -Wextra -std=c++11 -Iinclude -lOpenCL
 LDFLAGS = -L/usr/local/lib
 LIBS = -lOpenCL
 

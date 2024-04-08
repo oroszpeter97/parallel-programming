@@ -1,15 +1,21 @@
-__kernel void matrixMultiplication(__global float* A,
-                                   __global float* B,
-                                   __global float* C,
-                                   const int rows,
-                                   const int cols) {
+__kernel void matrixMultiply(__global const float* A,
+                              __global const float* B,
+                              __global float* C,
+                              const int M,
+                              const int N,
+                              const int K) {
+    // Get global thread ID
     int row = get_global_id(0);
     int col = get_global_id(1);
-    
-    float sum = 0.0f;
-    for (int k = 0; k < cols; ++k) {
-        sum += A[row * cols + k] * B[k * cols + col];
+
+    // Initialize result element
+    float result = 0.0f;
+
+    // Compute dot product for each element in the result matrix
+    for (int k = 0; k < K; ++k) {
+        result += A[row * K + k] * B[k * N + col];
     }
-    
-    C[row * cols + col] = sum;
+
+    // Write result to output matrix
+    C[row * N + col] = result;
 }

@@ -1,5 +1,5 @@
-CC = g++
-CFLAGS = -Wall -Wextra -std=c++11 -Iinclude -lOpenCL
+CC = gcc
+CFLAGS = -Wall -Wextra -Iinclude -lOpenCL
 LDFLAGS = -L/usr/local/lib
 LIBS = -lOpenCL
 
@@ -9,8 +9,8 @@ BINDIR = bin
 KERNELSDIR = kernels
 INCLUDEDIR = include
 
-SOURCES := $(wildcard $(SRCDIR)/*.cpp)
-OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.cpp=.o))
+SOURCES := $(wildcard $(SRCDIR)/*.c)
+OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.c=.o))
 EXECUTABLE = $(BINDIR)/main
 
 .PHONY: all clean run
@@ -21,7 +21,7 @@ $(EXECUTABLE): $(OBJECTS)
 	@mkdir -p $(BINDIR)
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS) $(LIBS)
 
-$(BUILDDIR)/%.o: $(SRCDIR)/%.cpp
+$(BUILDDIR)/%.o: $(SRCDIR)/%.c
 	@mkdir -p $(BUILDDIR)
 	$(CC) $(CFLAGS) -c -o $@ $<
 

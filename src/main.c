@@ -40,6 +40,7 @@ int main() {
   fclose(kernelFile);
 
   printf("Setting up kernel...");
+  fflush(stdout);
   cl_platform_id platformId = NULL;
   cl_device_id deviceId = NULL;
   cl_context context;
@@ -96,16 +97,20 @@ int main() {
     return EXIT_FAILURE;
   }
   printf("Kernel set up!");
+  fflush(stdout);
 
   printf("Memory allocation...\n");
-  const int M = 3000; // Number of rows in A and C
-  const int N = 3000; // Number of columns in B and C
-  const int K = 3000; // Number of columns in A and rows in B
+  fflush(stdout);
+  const int M = 1500; // Number of rows in A and C
+  const int N = 1500; // Number of columns in B and C
+  const int K = 1500; // Number of columns in A and rows in B
 
   float *A = (float *)malloc(sizeof(float) * M * K);
   float *B = (float *)malloc(sizeof(float) * K * N);
   float *C = (float *)malloc(sizeof(float) * M * N);
+  float *D = (float *)malloc(sizeof(float) * M * N);
   printf("Memory allocated!\n");
+  fflush(stdout);
 
   if (A == NULL || B == NULL || C == NULL) {
       fprintf(stderr, "Failed to allocate memory for matrices.\n");
@@ -113,6 +118,7 @@ int main() {
   }
   
   printf("Populating matrixes...\n");
+  fflush(stdout);
   for (int i = 0; i < M * K; ++i) {
     A[i] = i + 1; // Some example data
   }
@@ -120,8 +126,10 @@ int main() {
     B[i] = i + 1; // Some example data
   }
   printf("Finished populating matrixes!\n");
+  fflush(stdout);
 
   printf("Creating buffer objects...\n");
+  fflush(stdout);
   cl_mem bufferA = clCreateBuffer(context, CL_MEM_READ_ONLY,
                                   sizeof(float) * M * K, NULL, &err);
   cl_mem bufferB = clCreateBuffer(context, CL_MEM_READ_ONLY,
@@ -133,8 +141,10 @@ int main() {
     return EXIT_FAILURE;
   }
   printf("Buffer objects created!\n");
+  fflush(stdout);
 
   printf("Writing matrixes to device...\n");
+  fflush(stdout);
   err = clEnqueueWriteBuffer(commandQueue, bufferA, CL_TRUE, 0,
                              sizeof(float) * M * K, A, 0, NULL, NULL);
   err |= clEnqueueWriteBuffer(commandQueue, bufferB, CL_TRUE, 0,
@@ -144,8 +154,10 @@ int main() {
     return EXIT_FAILURE;
   }
   printf("Matrixes written to device!\n");
+  fflush(stdout);
 
   printf("Setting kernel arguments...\n");
+  fflush(stdout);
   err = clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&bufferA);
   err |= clSetKernelArg(kernel, 1, sizeof(cl_mem), (void *)&bufferB);
   err |= clSetKernelArg(kernel, 2, sizeof(cl_mem), (void *)&bufferC);
@@ -157,8 +169,10 @@ int main() {
     return EXIT_FAILURE;
   }
   printf("Kernel arguments set!\n");
+  fflush(stdout);
 
   printf("Executing kernel...\n");
+  fflush(stdout);
   // Define global and local work size
   size_t globalWorkSize[2] = {M, N};
   size_t localWorkSize[2] = {1, 1};
@@ -169,8 +183,10 @@ int main() {
     return EXIT_FAILURE;
   }
   printf("Kernel exited without error!\n");
+  fflush(stdout);
 
   printf("Reading kernel result buffer...\n");
+  fflush(stdout);
   err = clEnqueueReadBuffer(commandQueue, bufferC, CL_TRUE, 0,
                             sizeof(float) * M * N, C, 0, NULL, NULL);
   if (err != CL_SUCCESS) {
@@ -178,19 +194,16 @@ int main() {
     return EXIT_FAILURE;
   }
   printf("Kernel result buffer read!\n");
+  fflush(stdout);
 
-  // Print result matrix C
-  /*
-  printf("Result Matrix C:\n");
-  for (int i = 0; i < M; ++i) {
-    for (int j = 0; j < N; ++j) {
-      printf("%f\t", C[i * N + j]);
-    }
-    printf("\n");
-  }
-  */
+  printf("Regular matrix multiplication...\n");
+  fflush(stdout);
+  matrixMultiply(A, B, D, M, N, K);
+  printf("Regular matrix multiplication finished!\n");
+  fflush(stdout);
 
   printf("Cleaning up...\n");
+  fflush(stdout);
   clReleaseMemObject(bufferA);
   clReleaseMemObject(bufferB);
   clReleaseMemObject(bufferC);
@@ -203,6 +216,7 @@ int main() {
   free(B);
   free(C);
   printf("Cleaned up!\n");
+  fflush(stdout);
 
   return EXIT_SUCCESS;
 }

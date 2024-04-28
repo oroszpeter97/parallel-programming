@@ -1,3 +1,6 @@
+# Assigment
+Compare the execution time of big matrix multiplications using CPU and GPU with OpenCL.
+
 ## Usage
 
 ### Compilation
